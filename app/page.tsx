@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { config, epicClientId } from "@/lib/config";
+import { config, epicClientId, redirectUri } from "@/lib/config";
 import { getT } from "@/lib/i18n/server";
 import { getSession, validToken } from "@/lib/session";
 
@@ -12,8 +12,8 @@ export default async function Home(props: PageProps<"/">) {
 
   const checks: { label: string; ok: boolean; detail: string }[] = [
     { label: t("home.check.dataSource"), ok: true, detail: config.dataSource === "epic" ? t("home.check.dataSource.epic") : t("home.check.dataSource.offline") },
-    { label: t("home.check.clinicianApp"), ok: config.dataSource === "offline" || epicClientId("clinician") !== null, detail: epicClientId("clinician") ? t("common.configured") : t("home.check.missingEnv", { name: "EPIC_CLINICIAN_CLIENT_ID" }) },
-    { label: t("home.check.patientApp"), ok: config.dataSource === "offline" || epicClientId("patient") !== null, detail: epicClientId("patient") ? t("common.configured") : t("home.check.missingEnv", { name: "EPIC_PATIENT_CLIENT_ID" }) },
+    { label: t("home.check.clinicianApp"), ok: config.dataSource === "offline" || epicClientId("clinician") !== null, detail: `${epicClientId("clinician") ? t("common.configured") : t("home.check.missingEnv", { name: "EPIC_CLINICIAN_CLIENT_ID" })} · ${t("home.check.redirect", { uri: redirectUri("clinician") })}` },
+    { label: t("home.check.patientApp"), ok: config.dataSource === "offline" || epicClientId("patient") !== null, detail: `${epicClientId("patient") ? t("common.configured") : t("home.check.missingEnv", { name: "EPIC_PATIENT_CLIENT_ID" })} · ${t("home.check.redirect", { uri: redirectUri("patient") })}` },
     { label: t("home.check.claude"), ok: config.claude.configured, detail: config.claude.configured ? `${t("common.configured")} · ${config.claude.model}` : t("home.check.missingEnv", { name: "ANTHROPIC_API_KEY" }) },
     { label: t("home.check.mcp"), ok: true, detail: config.epic.mcpUrl ? t("home.check.mcp.remote") : t("home.check.mcp.bridge") },
   ];

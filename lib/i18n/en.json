@@ -189,6 +189,7 @@
  "home.check.mcp.remote": "Remote MCP server from EPIC_MCP_URL",
  "home.check.missingEnv": "Set {name} in .env",
  "home.check.patientApp": "Epic patient (MyChart) app",
+ "home.check.redirect": "Redirect URI to register in Epic (exact match): {uri}",
  "home.lead": "Two AI agents support the ACTU pathway after sternal wire–related procedures: one collects the pre-visit questionnaire and wound photo, the other prepares the evidence for the APN.",
  "home.openPatientApp": "See the patients' phones",
  "home.openWorklist": "Open the ACTU worklist",

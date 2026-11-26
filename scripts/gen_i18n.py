@@ -50,6 +50,7 @@ k("home.check.claude","Claude API (both agents)","API Claude (les deux agents)")
 k("home.check.mcp","MCP connection to the chart","Connexion MCP au dossier")
 k("home.check.mcp.bridge","Built-in read-only Epic FHIR MCP bridge (stand-in for Epic's MCP connectors, announced for Q1 2027)","Passerelle MCP Epic FHIR intégrée en lecture seule (en attendant les connecteurs MCP d'Epic, annoncés pour le T1 2027)")
 k("home.check.mcp.remote","Remote MCP server from EPIC_MCP_URL","Serveur MCP distant (EPIC_MCP_URL)")
+k("home.check.redirect","Redirect URI to register in Epic (exact match): {uri}","URI de redirection à inscrire dans Epic (correspondance exacte) : {uri}")
 k("home.check.missingEnv","Set {name} in .env","Définir {name} dans .env")
 k("home.setupHelp","See README.md for the Epic app registration steps. Keys and client IDs go in .env, never in the code.","Voir README.md pour l'inscription des applications Epic. Les clés et identifiants vont dans .env, jamais dans le code.")
 

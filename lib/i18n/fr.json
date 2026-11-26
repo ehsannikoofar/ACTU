@@ -189,6 +189,7 @@
  "home.check.mcp.remote": "Serveur MCP distant (EPIC_MCP_URL)",
  "home.check.missingEnv": "Définir {name} dans .env",
  "home.check.patientApp": "Application patient Epic (MyChart)",
+ "home.check.redirect": "URI de redirection à inscrire dans Epic (correspondance exacte) : {uri}",
  "home.lead": "Deux agents d'IA soutiennent le cheminement de l'UTCA après une intervention liée aux fils sternaux : l'un recueille le questionnaire avant la visite et la photo de la plaie, l'autre prépare les données pour l'IPA.",
  "home.openPatientApp": "Voir les téléphones des patients",
  "home.openWorklist": "Ouvrir la liste de travail de l'UTCA",
