@@ -3,6 +3,8 @@
 > **Source:** *Virtual Follow-Up After Sternal Wire–Related Procedures: An Evidence-Informed Clinical Decision Pathway and Implementation Framework for the Acute Cardiac Triage Unit* (UOHI MHA Final Field Project Report, Dec 2026). Section, table and figure numbers below refer to that report.
 >
 > **Status:** Draft for Checkpoint 1. Nothing here has been clinically validated. Where the report is ambiguous, the item is listed under [§8 Open questions](#8-open-questions) and **not** resolved in this spec. Rule IDs (`R-xx`) and step IDs (`S-xx`) are stable and will be reused in code, tests and `docs/traceability.md`.
+>
+> **Update (Nov 26, 2026):** The build is now a two-agent proof of concept. See [`poc-plan.md`](poc-plan.md). It resolves OQ-05 and OQ-16 and adopts the slide-8 decision rule.
 
 ---
 
