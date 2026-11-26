@@ -198,7 +198,7 @@ The index is **deterministic and transparent.** The AI only *extracts findings*,
 | Data completeness: questionnaire complete · usable photo · OR note found | 10 | All |
 | **Total** | **100** | |
 
-**Gates** (these override the score, following slide 8):
+**Gates** *(superseded by D-2: red flags now raise APN attention and never auto-route)*:
 - **Any red flag** (questionnaire *or* a photo finding above a confidence threshold) → recommendation **In person**, with the score capped at 30.
 - **Retention/stay sutures** → hands-on need → **In person** (or local removal; see D-1).
 - "No" in the Patient section → **Phone visit or local support**.
@@ -263,14 +263,14 @@ You'll also need a **Claude API key** for the agents. When we start, I'll reques
 
 ---
 
-## 12. Decisions needed before I scaffold
+## 12. Decisions (answered by the project owner, 2026-11-26)
 
-- **D-1 — Sutures.** Slides 8 and 11 drop the report's "local suture removal + APN virtual check" route (any hands-on need → in person). Should the PoC follow the **slides** (simpler: Virtual / In person / Phone) or show the **local-removal** option as a fourth route?
-- **D-2 — Suitability Index.** Approve the weights and gates in §7, or give me yours. I won't invent clinical weights beyond this proposal.
-- **D-3 — Wound photos.** Which source should the synthetic images come from?
-  - **(a)** You supply images you have the rights to that are not real patients.
-  - **(b)** You generate synthetic images with an image tool and I add a "SYNTHETIC" watermark.
-  - **(c)** I draw stylized illustrations. These are honest but less convincing for vision analysis.
-- **D-4 — Red flag during the agent call.** What should the agent say and do? My proposed default: stop the questionnaire, tell the patient a nurse will call them back shortly, and put an **urgent** item at the top of the RN worklist. If the patient describes severe chest pain or trouble breathing *right now*, the agent tells them to **call 911**. Please confirm or edit this wording; it's clinical logic.
-- **D-5 — Where it runs on presentation day.** On your laptop (`npm run dev`, localhost redirect URIs), which is what I recommend, or a hosted URL (e.g., Vercel, which needs those redirect URIs registered too)?
-- **D-6 — Branding.** Your slides use the real UOHI logo. Should the app keep a **placeholder** logo (the earlier rule), or will you provide the official asset?
+| ID | Decision |
+|---|---|
+| D-1 Sutures | **Show both, APN picks.** Retention-suture patients without red flags get two options: *local suture removal + short APN virtual check* and *in-person ACTU*, with distance to UOHI shown. |
+| D-2 Index | **Out of 100, weights 30/30/20/10/10 kept.** A red flag is **flagged for APN attention and decision**; it does *not* force a route or cap the score (this supersedes the "gates" in §7). |
+| D-2b Glycemia | Flag uncontrolled diabetes / high glycemia, using "the safest rule per guidelines". Implemented as the most sensitive defensible rule, since the flag only draws attention: HbA1c > 7.0 % (Diabetes Canada target), glucose > 10.0 mmol/L in the last 14 days (perioperative/in-hospital upper target), diabetes coded "with hyperglycemia", or a diabetic patient with no HbA1c in 6 months. **Needs clinical sign-off** (`lib/pathway/clinical-config.ts`). |
+| D-3 Photos | **Generated synthetic images with a watermark** (`scripts/make_wound_images.py`). |
+| D-4 Call | The agent **only collects** questionnaire answers and the wound photo (video). It opens every call with: *"This call only collects your answers for your care team. If you have an emergency, hang up and call 911."* |
+| D-5 Hosting | **Laptop** for now; a web address may be needed later (add its redirect URIs in Epic and set `APP_BASE_URL`). |
+| D-6 Branding | **Official UOHI 50-years logo** supplied by the owner (`public/logo-ohi.svg`). |
