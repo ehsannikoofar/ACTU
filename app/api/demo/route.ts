@@ -4,6 +4,7 @@ import { now, setNow } from "@/lib/clock";
 import { COHORT, visitAt } from "@/lib/demo/cohort";
 import { requireClinician, sameOrigin } from "@/lib/guards";
 import { seedOrNote, syncOutreach } from "@/lib/service";
+import { checkMcpTools } from "@/lib/mcp/check";
 import { getState, resetState } from "@/lib/store";
 
 // Demo controls: fast-forward the clock, reset, file synthetic OR notes to the sandbox.
@@ -29,6 +30,13 @@ export async function POST(req: Request) {
     if (!g.ok) return g.res;
     const results: Record<string, string> = {};
     for (const e of COHORT) results[e.id] = await seedOrNote(e.id);
+    return NextResponse.json({ ok: true, results });
+  }
+  if (body.action === "check-mcp") {
+    const g = await requireClinician();
+    if (!g.ok) return g.res;
+    const results = await checkMcpTools(g.value.fhir, g.value.session?.clinician?.accessToken ?? null);
+    audit({ actor: g.value.actor, action: "demo.mcp_check" });
     return NextResponse.json({ ok: true, results });
   }
   return NextResponse.json({ error: "unknown action" }, { status: 400 });

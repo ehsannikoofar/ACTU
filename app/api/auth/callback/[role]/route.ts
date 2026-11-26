@@ -21,7 +21,8 @@ export async function GET(req: Request, ctx: RouteContext<"/api/auth/callback/[r
     if (role === "clinician") session.clinician = token;
     else session.patient = token;
     const who = token.fhirUser?.split("/").pop() ?? token.patientId ?? "unknown";
-    audit({ actor: role === "clinician" ? { kind: "clinician", id: who } : { kind: "system" }, action: `auth.${role}.success`, detail: { patientContext: token.patientId ? "yes" : "no" } });
+    audit({ actor: role === "clinician" ? { kind: "clinician", id: who } : { kind: "system" }, action: `auth.${role}.success`, // Granted scopes = which Epic APIs this client may call (no token, no PHI) — useful when Epic returns 403.
+      detail: { patientContext: token.patientId ? "yes" : "no", scope: token.scope.slice(0, 1500) } });
     return NextResponse.redirect(new URL(pending.returnTo, url));
   } catch (e) {
     audit({ actor: { kind: "system" }, action: `auth.${role}.failed` });

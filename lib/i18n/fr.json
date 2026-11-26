@@ -124,6 +124,7 @@
  "demo.audit.actor": "Qui",
  "demo.audit.enrollment": "Inscription",
  "demo.audit.time": "Heure",
+ "demo.checkMcp": "Vérifier les données Epic par MCP",
  "demo.clock": "Horloge de la démo",
  "demo.done": "Terminé.",
  "demo.fileOrNotes": "Déposer les protocoles opératoires synthétiques dans Epic",

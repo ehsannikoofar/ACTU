@@ -285,6 +285,7 @@ k("demo.now","Now","Maintenant"); k("demo.visit","Follow-up visits","Visites de 
 k("demo.hoursToVisit","{h} h before the visit","{h} h avant la visite")
 k("demo.jump","Jump to V−{h} h","Aller à V−{h} h")
 k("demo.fileOrNotes","File synthetic OR notes to Epic","Déposer les protocoles opératoires synthétiques dans Epic")
+k("demo.checkMcp","Check Epic data via MCP","Vérifier les données Epic par MCP")
 k("demo.reset","Reset demo","Réinitialiser la démo")
 k("demo.resetConfirm","Reset the demo? This clears answers, photos, assistant results and decisions (the audit log is kept).","Réinitialiser la démo? Les réponses, photos, résultats de l'assistant et décisions seront effacés (la piste de vérification est conservée).")
 k("demo.signInForNotes","Sign in with Epic to file the OR notes.","Connectez-vous à Epic pour déposer les protocoles opératoires.")

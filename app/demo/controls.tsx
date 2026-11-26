@@ -17,7 +17,7 @@ export function DemoControls({ signedIn }: { signedIn: boolean }) {
     const j = (await res.json()) as { error?: string; results?: Record<string, string> };
     setBusy(false);
     if (!res.ok) setMsg({ tone: "danger", text: j.error ?? `HTTP ${res.status}` });
-    else if (j.results) setMsg({ tone: "ok", text: Object.entries(j.results).map(([k, v]) => `${k}: ${v}`).join(" · ") });
+    else if (j.results) setMsg({ tone: "ok", text: Object.entries(j.results).map(([k, v]) => `${k}: ${v}`).join("\n") });
     else setMsg({ tone: "ok", text: t("demo.done") });
     router.refresh();
   }
@@ -33,10 +33,11 @@ export function DemoControls({ signedIn }: { signedIn: boolean }) {
       </div>
       <div className="row">
         <button className="btn ghost" disabled={busy || !signedIn} onClick={() => act({ action: "seed-or-notes" })}>{t("demo.fileOrNotes")}</button>
+        <button className="btn ghost" disabled={busy || !signedIn} onClick={() => act({ action: "check-mcp" })}>{t("demo.checkMcp")}</button>
         <button className="btn ghost" disabled={busy} onClick={() => act({ action: "reset" }, t("demo.resetConfirm"))}>{t("demo.reset")}</button>
       </div>
       {!signedIn && <p className="small muted">{t("demo.signInForNotes")}</p>}
-      <div role="status" aria-live="polite">{msg && <p className={`notice ${msg.tone}`}>{msg.text}</p>}</div>
+      <div role="status" aria-live="polite">{msg && <p className={`notice ${msg.tone}`} style={{ whiteSpace: "pre-line" }}>{msg.text}</p>}</div>
     </div>
   );
 }

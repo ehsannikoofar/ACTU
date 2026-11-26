@@ -124,6 +124,7 @@
  "demo.audit.actor": "Who",
  "demo.audit.enrollment": "Enrollment",
  "demo.audit.time": "Time",
+ "demo.checkMcp": "Check Epic data via MCP",
  "demo.clock": "Demo clock",
  "demo.done": "Done.",
  "demo.fileOrNotes": "File synthetic OR notes to Epic",
