@@ -1,0 +1,18 @@
+# dependencies
+node_modules/
+# next
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+# secrets — never commit
+.env
+.env.*
+!.env.example
+# runtime data (sessions, audit log, captured photos)
+data/*
+!data/.gitkeep
+# misc
+.DS_Store
+npm-debug.log*
+coverage/
