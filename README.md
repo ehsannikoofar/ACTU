@@ -59,7 +59,13 @@ then **Save** and **Mark Ready for Sandbox**. Changes can take **up to 1 hour** 
 - Redirect URI: `http://localhost:3000/api/auth/callback/patient`
 - APIs (R4): Patient.Read · **QuestionnaireResponse.Create**
 
-Copy each app's **Non-Production Client ID** into `.env`. (API names on the Epic site may be worded
+Copy each app's **Non-Production Client ID** into `.env`. Then check that the sandbox accepts them:
+
+```bash
+npm run check:epic
+```
+
+✓ means Epic shows its login page; ✗ means Epic shows "Something went wrong trying to authorize the client" (client ID not synced yet, not the Non-Production ID, or redirect URI not registered exactly). (API names on the Epic site may be worded
 slightly differently; pick the R4 versions closest to the list above.)
 
 If you later host the app (e.g. a web address for the committee), add that address's

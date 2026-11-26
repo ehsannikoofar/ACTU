@@ -12,7 +12,8 @@
     "start": "next start -p 3000",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "images": "python3 scripts/make_wound_images.py"
+    "images": "python3 scripts/make_wound_images.py",
+    "check:epic": "node --env-file=.env scripts/check-epic.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "1.14.0",
