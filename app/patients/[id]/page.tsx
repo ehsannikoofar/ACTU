@@ -30,7 +30,7 @@ export default async function PatientReview(props: PageProps<"/patients/[id]">) 
     return (
       <div className="stack">
         <p className="notice">{t("wl.signInNeeded")}</p>
-        <a className="btn" href={`/api/auth/login/clinician?returnTo=/patients/${id}`}>{t("auth.signIn")}</a>
+        <a className="btn" href="/signin">{t("auth.signIn")}</a>
       </div>
     );
   }

@@ -55,7 +55,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <button className="btn ghost small" type="submit">{t("auth.signOut")}</button>
                 </form>
               ) : config.dataSource === "epic" ? (
-                <a className="btn small" href="/api/auth/login/clinician?returnTo=/worklist">{t("auth.signIn")}</a>
+                <a className="btn small" href="/signin">{t("auth.signIn")}</a>
               ) : null}
               <LangToggle other={other} label={t("lang.switchLabel")} text={t("lang.switch")} />
             </div>

@@ -36,7 +36,7 @@ export default async function Home(props: PageProps<"/">) {
             {signedIn || config.dataSource === "offline" ? (
               <Link className="btn" href="/worklist">{t("home.openWorklist")}</Link>
             ) : (
-              <a className="btn" href="/api/auth/login/clinician?returnTo=/worklist">{t("auth.signIn")}</a>
+              <a className="btn" href="/signin">{t("auth.signIn")}</a>
             )}
             <Link className="btn secondary" href="/patient">{t("home.openPatientApp")}</Link>
             <Link className="btn ghost" href="/demo">{t("nav.demo")}</Link>

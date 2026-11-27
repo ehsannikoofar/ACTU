@@ -18,7 +18,7 @@ export default async function Worklist() {
       <div className="stack">
         <h1>{t("wl.title")}</h1>
         <p className="notice">{t("wl.signInNeeded")}</p>
-        <a className="btn" href="/api/auth/login/clinician?returnTo=/worklist">{t("auth.signIn")}</a>
+        <a className="btn" href="/signin">{t("auth.signIn")}</a>
       </div>
     );
   }

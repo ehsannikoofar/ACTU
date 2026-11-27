@@ -23,7 +23,7 @@ export default async function CallPage(props: PageProps<"/patient/[id]/call">) {
       {!authorised ? (
         <>
           <p className="notice">{t("call.needClinician")}</p>
-          <a className="btn" href={`/api/auth/login/clinician?returnTo=/patient/${e.id}/call`}>{t("auth.signIn")}</a>
+          <a className="btn" href="/signin">{t("auth.signIn")}</a>
         </>
       ) : (
         <CallScreen enrollmentId={e.id} photos={[...SYNTHETIC_PHOTOS]} suggested={e.suggestedPhoto} claudeReady={config.claude.configured} />
