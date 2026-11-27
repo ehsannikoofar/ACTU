@@ -90,6 +90,17 @@ Never commit `.env`. Never paste keys or passwords into chat or code.
 
 ---
 
+### Clinician sign-in: two ways
+
+1. **Sign in with Epic** (header button), a standalone launch to Epic's clinician login page.
+2. **Launch from Epic (EHR launch)**, using Epic's **LaunchPad**. Use this if Epic's clinician login page is blank (seen on 2026-11-26/27: Epic's page failed to load its own files). It is also closer to real life: the APN opens the tool from inside Epic.
+   1. Make sure the app is running (`npm run dev`).
+   2. On fhir.epic.com (signed in), open **Documentation → Testing Guide** → *LaunchPad*: **SMART on FHIR (OAuth 2.0) → Try It**.
+   3. Pick any test patient, enter the launch URL `http://localhost:3000/api/auth/launch`, and type any text for the AES secret (the app does not use it).
+   4. Click **Launch**. The app opens on the worklist, signed in as the Epic test user.
+
+   For safety, the app only accepts launches whose `iss` is the configured Epic sandbox (`EPIC_FHIR_BASE_URL`).
+
 ## 4. Sandbox test accounts
 
 You type these **only on Epic's own login page**. Passwords are on Epic's public

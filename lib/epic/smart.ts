@@ -27,7 +27,11 @@ const SCOPES: Record<PendingAuth["role"], string> = {
   patient: "openid fhirUser launch/patient",
 };
 
-export async function buildAuthorizeUrl(role: PendingAuth["role"], returnTo: string): Promise<{ url: string; pending: PendingAuth }> {
+/**
+ * Standalone launch, or — when `launch` is given — an EHR launch (Epic LaunchPad / Hyperspace),
+ * which carries the signed-in Epic user and skips Epic's login page.
+ */
+export async function buildAuthorizeUrl(role: PendingAuth["role"], returnTo: string, launch?: string): Promise<{ url: string; pending: PendingAuth }> {
   const clientId = epicClientId(role);
   if (!clientId) throw new Error(`EPIC_${role.toUpperCase()}_CLIENT_ID is not configured`);
   const { authorization_endpoint } = await smartConfig();
@@ -39,7 +43,8 @@ export async function buildAuthorizeUrl(role: PendingAuth["role"], returnTo: str
     response_type: "code",
     client_id: clientId,
     redirect_uri: redirectUri(role),
-    scope: SCOPES[role],
+    scope: launch ? "launch openid fhirUser" : SCOPES[role],
+    ...(launch ? { launch } : {}),
     state,
     aud: config.epic.fhirBaseUrl,
     code_challenge: challenge,
