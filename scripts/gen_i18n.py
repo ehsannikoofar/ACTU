@@ -203,7 +203,7 @@ k("dec.note","Note (optional)","Note (facultative)")
 k("dec.submit","Record decision","Enregistrer la décision"); k("dec.update","Update decision","Mettre à jour la décision")
 k("dec.existing","Recorded by {by}.","Enregistrée par {by}.")
 k("dec.choose","Choose a follow-up option.","Choisissez une option de suivi.")
-k("dec.savedEpic","Decision recorded and filed in Epic as a clinical note.","Décision enregistrée et déposée dans Epic comme note clinique.")
+k("dec.savedEpic","Decision recorded. One clinical note with the answers, the assistant findings and the decision was filed in Epic.","Décision enregistrée. Une note clinique avec les réponses, les constats de l'assistant et la décision a été déposée dans Epic.")
 k("dec.savedLocal","Decision recorded. Not filed in Epic: {note}","Décision enregistrée. Non déposée dans Epic : {note}")
 
 # Patient phones
@@ -236,9 +236,8 @@ k("ci.photo","Photo of your incision","Photo de votre incision")
 k("ci.photoHelp","Demo: choose a synthetic photo (no real patient images are used).","Démo : choisissez une photo synthétique (aucune image de vrai patient n'est utilisée).")
 k("ci.suggested","Suggested for this demo patient: {name}.","Suggérée pour ce patient de démo : {name}.")
 k("ci.submit","Send to my care team","Envoyer à mon équipe de soins")
+k("ci.sent","Sent. Your care team will review your answers before your visit.","Envoyé. Votre équipe de soins examinera vos réponses avant votre visite.")
 k("ci.missing","Please answer all questions ({n} left).","Veuillez répondre à toutes les questions (il en reste {n}).")
-k("ci.sentEpic","Sent. Your answers were filed in Epic.","Envoyé. Vos réponses ont été déposées dans Epic.")
-k("ci.sentLocal","Sent to your care team. Not filed in Epic: {note}","Envoyé à votre équipe de soins. Non déposé dans Epic : {note}")
 for key,en,fr in [("wound-healing.jpg","Healing well","Bonne guérison"),("wound-retention-sutures.jpg","Retention sutures in place","Sutures de rétention en place"),("wound-redness-drainage.jpg","Redness and drainage","Rougeur et écoulement"),("wound-gap.jpg","Gap in the incision","Écart dans l'incision"),("wound-protruding-wire.jpg","Protruding wire","Fil qui dépasse")]:
     k(f"photo.{key}",en,fr)
 

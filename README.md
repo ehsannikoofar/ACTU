@@ -52,12 +52,12 @@ then **Save** and **Mark Ready for Sandbox**. Changes can take **up to 1 hour** 
 **App 1 — "ACTU Follow-Up (Clinician)"**
 - Application audience: *Clinicians or Administrative Users*
 - Redirect URI: `http://localhost:3000/api/auth/callback/clinician`
-- APIs (R4): Patient.Read, Patient.Search · Condition.Search (Problems) · Observation.Search (Labs) · Observation.Search (Vital Signs) · MedicationRequest.Search · Encounter.Search · DocumentReference.Search/Read (Clinical Notes) · **DocumentReference.Create (Clinical Notes)** · Binary.Read (Clinical Notes) · **QuestionnaireResponse.Create**
+- APIs (R4): Patient.Read, Patient.Search · Condition.Search (Problems) · Observation.Search (Labs) · Observation.Search (Vital Signs) · MedicationRequest.Search · Encounter.Search · DocumentReference.Search/Read (Clinical Notes) · **DocumentReference.Create (Clinical Notes)** · Binary.Read (Clinical Notes)
 
 **App 2 — "ACTU Follow-Up (Patient)"**
 - Application audience: *Patients*
 - Redirect URI: `http://localhost:3000/api/auth/callback/patient`
-- APIs (R4): Patient.Read · **QuestionnaireResponse.Create**
+- APIs (R4): Patient.Read (Demographics) — that is all the patient app needs. (Epic does not offer patient apps any way to save a custom questionnaire; see §7.)
 
 Copy each app's **Non-Production Client ID** into `.env`. Then check that the sandbox accepts them:
 
@@ -131,7 +131,7 @@ Reset with **Reset demo** (the audit log on disk is kept).
 | Clinician and patient sign-in | **Real** SMART on FHIR standalone launch (public client + PKCE S256), verified against the sandbox's `/.well-known/smart-configuration` |
 | Chart reads (Patient, Condition, Observation, MedicationRequest, Encounter, DocumentReference) | **Real** FHIR R4 reads |
 | Agent 2 → chart | **Real MCP** protocol to a built-in read-only **Epic FHIR MCP bridge** (`lib/mcp/`). The open.epic MCP server only serves *documentation* (no PHI); Epic's patient-data MCP connectors are announced for **Q1 2027**. Set `EPIC_MCP_URL` to switch. |
-| QuestionnaireResponse / DocumentReference writes | **Attempted** in Epic; on refusal the data is kept locally and the UI shows *why* (never silent) |
+| Saving to Epic | **One clinical note per patient** (`DocumentReference.Create (Clinical Notes)`, clinician app) when the APN records the decision: the 10 answers, the assistant findings, the index and the decision. Synthetic OR notes the same way. On refusal the data stays in the app and the UI shows *why* (never silent). |
 | MyChart notifications (V−72/V−48) | **Simulated** phone screens — Epic has no API for outbound MyChart notifications |
 | The V−24 h call | **In-browser** voice/video; real telephony is out of scope |
 | Clock | **Demo clock** you fast-forward |
@@ -141,7 +141,9 @@ Reset with **Reset demo** (the audit log on disk is kept).
 
 ## 7. Known limitations
 
-- **Sandbox write gaps** (from the live CapabilityStatement): `Appointment` and `Media` are read-only — visit-type changes and photos stay local. `QuestionnaireResponse.Create`, `DocumentReference.Create` and `Communication.Create` are listed, but whether *this* client can use them is only confirmed on first run (shown on screen and in the audit log). Epic's per-API spec pages could not be fetched (JavaScript-rendered).
+- **Questionnaire answers are not saved as a FHIR QuestionnaireResponse.** Epic's `QuestionnaireResponse.Create (Patient-Entered Questionnaires)` is offered only to backend and clinician apps, and only accepts answers to questionnaires **built in Epic and assigned to an appointment or questionnaire series** (Epic API spec 10023). Confirmed live: the patient app was granted only `patient/Patient.read`, and the attempt returned HTTP 403. The answers are therefore filed inside the APN decision note. In a real rollout, building the questionnaire in Epic (MyChart questionnaire / flowsheet, report Table 13) would make a structured save possible.
+- **Sandbox write gaps** (live CapabilityStatement): `Appointment` and `Media` are read-only — visit-type changes and photos stay local. `DocumentReference.Create (Clinical Notes)` files to an encounter; the app uses the patient's most recent encounter.
+- **Epic's clinician login page** failed to load its own scripts (HTTP 404 from Epic) in a live test on 2026-11-26, while MyChart login worked end to end. If you see a blank page after *Sign in with Epic*, it is on Epic's side — retry later or rehearse in offline mode.
 - **Not yet run end-to-end with live Epic or Claude** in this build environment (no client IDs or API key available here). Pathway logic, UI and APIs are tested; first live run may surface Epic/Claude behaviour to adjust.
 - **Clinical thresholds need sign-off**: Suitability Index weights (30/30/20/10/10, owner-approved for the demo), photo-finding threshold 0.5, glycemia flag (HbA1c > 7.0 %, glucose > 10.0 mmol/L in 14 d, coded hyperglycemia, no HbA1c in 6 months) — see `lib/pathway/clinical-config.ts`.
 - **Speech recognition** uses the browser's Web Speech API; in Chrome, audio is processed by Google's speech service. Use synthetic speech only. Typed input and Yes/No buttons always work.

@@ -20,7 +20,7 @@ Rule and step IDs come from [`pathway-spec.md`](pathway-spec.md). PoC scope is i
 | R-11 Patient characteristics never exclude; glycemia only flags (owner decision) | Assistant flags | `lib/pathway/glycemia.ts` | `glycemia attention flag` suite; `never changes the score` |
 | Suitability Index 0–100, weights 30/30/20/10/10 (owner-approved) | Assistant → index + breakdown | `lib/pathway/suitability.ts`, `clinical-config.ts` | `scores 100…`, `components always sum…` |
 | R-16 AI recommends, APN decides | Decision form (only place a route is set) | `app/api/patients/[id]/decision/route.ts` | API smoke test (manual) |
-| Decision documented (Table 11) | Patient review → Epic write-back | `clinicalNote` via `writeToEpic` | manual (needs Epic) |
+| Decision documented (Table 11) — ONE note with answers, AI findings, index and decision (Option A) | Patient review → Epic write-back | `lib/epic/decision-note.ts`, `clinicalNote` via `writeToEpic`, `latestEncounterId` | `tests/decision-note.test.ts`; Epic filing: manual (needs clinician login) |
 | Audit: who/what/when, no PHI | Patient review & Demo → audit | `lib/audit.ts` | manual check: no tokens/names in `data/audit.jsonl` |
 | Bilingual EN/FR | Header toggle | `lib/i18n/*`, `scripts/gen_i18n.py` | `tests/i18n.test.ts` |
 | Pilot KPIs (Table 17) | — (not in PoC scope) | — | — |

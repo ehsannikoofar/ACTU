@@ -7,7 +7,7 @@ import { now } from "@/lib/clock";
 import { config } from "@/lib/config";
 import { COHORT, type Enrollment, SYNTHETIC_PHOTOS, enrollmentById, procedureDate, visitAt } from "@/lib/demo/cohort";
 import { type FhirSource, type Resource, fhirSource, patientName } from "@/lib/epic/fhir";
-import { clinicalNote, questionnaireResponse } from "@/lib/epic/resources";
+import { clinicalNote } from "@/lib/epic/resources";
 import { writeToEpic } from "@/lib/epic/writer";
 import { DICTS } from "@/lib/i18n";
 import type { AssistantResult } from "@/lib/agents/assistant";
@@ -98,10 +98,6 @@ export async function worklist(): Promise<{ rows: WorklistRow[]; epicError: stri
   return { rows, epicError };
 }
 
-export function questionLabels(lang: "en" | "fr" = "en"): Record<string, string> {
-  return Object.fromEntries(ITEMS.map((i) => [i.id, DICTS[lang][`q.${i.id}`] ?? i.id]));
-}
-
 export function savePhotoFromSynthetic(enrollmentId: string, name: string): string {
   if (!(SYNTHETIC_PHOTOS as readonly string[]).includes(name)) throw new Error("unknown synthetic photo");
   fs.mkdirSync(PHOTO_DIR, { recursive: true });
@@ -123,12 +119,16 @@ export function savePhotoFromDataUrl(enrollmentId: string, dataUrl: string): str
   return file;
 }
 
-/** Record completed screening answers (from MyChart-style form or the agent call) and file them to Epic if possible. */
+/**
+ * Record completed screening answers (from the MyChart-style form or the agent call).
+ * Kept in the app until the APN decides; they are then filed to Epic inside the decision note
+ * (Option A). Epic's QuestionnaireResponse.Create only accepts Epic-built questionnaires assigned
+ * to an appointment/series and is not offered to patient-facing apps, so it is not used.
+ */
 export async function recordScreening(params: {
   enrollmentId: string;
   answers: Answers;
   source: "mychart" | "call";
-  fhir: FhirSource | null;
   actor: Actor;
 }): Promise<void> {
   const e = enrollmentById(params.enrollmentId)!;
@@ -141,7 +141,14 @@ export async function recordScreening(params: {
     st.events.push({ type: params.source === "mychart" ? "questionnaire_submitted" : "call_completed", at, channel: params.source });
   });
   audit({ actor: params.actor, action: "screening.recorded", enrollmentId: e.id, demoAt: at, detail: { source: params.source } });
-  await writeToEpic(params.fhir, e.id, params.actor, questionnaireResponse(e.fhirPatientId, params.answers, at, questionLabels("en")));
+}
+
+/** Most recent encounter for the patient — Epic files clinical notes (DocumentReference.Create) to an encounter. */
+export async function latestEncounterId(fhir: FhirSource | null, patientId: string): Promise<string | undefined> {
+  if (fhir?.kind !== "epic") return undefined;
+  const enc = await fhir.search("Encounter", { patient: patientId }).catch(() => []);
+  const start = (r: Resource) => Date.parse(r.period?.start ?? r.period?.end ?? "") || 0;
+  return [...enc].sort((a, b) => start(b) - start(a))[0]?.id;
 }
 
 /** Try to file the synthetic OR note into the sandbox as a clinical note (DocumentReference.Create). */
@@ -152,11 +159,7 @@ export async function seedOrNote(enrollmentId: string): Promise<string> {
   const st = enrollmentState(e.id);
   if (st.orNote?.target === "epic") return "already filed";
   const actor = clinicianActor(session);
-  let encounterId: string | undefined;
-  if (fhir?.kind === "epic") {
-    const enc = await fhir.search("Encounter", { patient: e.fhirPatientId }).catch(() => []);
-    encounterId = enc.at(-1)?.id;
-  }
+  const encounterId = await latestEncounterId(fhir, e.fhirPatientId);
   const note = clinicalNote(e.fhirPatientId, "Operative note (SYNTHETIC demo)", e.orNote, procedureDate(e, getState().demo.startedAt), encounterId);
   const rec = await writeToEpic(fhir, e.id, actor, note);
   update(() => {

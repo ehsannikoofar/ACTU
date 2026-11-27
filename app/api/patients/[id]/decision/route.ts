@@ -2,16 +2,19 @@ import { NextResponse } from "next/server";
 import { audit } from "@/lib/audit";
 import { now } from "@/lib/clock";
 import { DICTS } from "@/lib/i18n";
+import { decisionNoteText } from "@/lib/epic/decision-note";
 import { clinicalNote } from "@/lib/epic/resources";
 import { writeToEpic } from "@/lib/epic/writer";
 import { enrollmentOr404, requireClinician, sameOrigin } from "@/lib/guards";
 import type { AssistantResult } from "@/lib/agents/assistant";
 import type { RouteOption } from "@/lib/pathway/suitability";
+import { latestEncounterId } from "@/lib/service";
 import { enrollmentState, update } from "@/lib/store";
 
 const ROUTES: RouteOption[] = ["virtual_visit", "phone_visit_or_local_support", "local_suture_removal_plus_apn_check", "in_person_actu", "phone_advice"];
 
 // The APN's decision. The assistant never applies a route; only this clinician action does.
+// Files ONE clinical note to Epic with the screening answers, the assistant's findings and the decision.
 export async function POST(req: Request, ctx: RouteContext<"/api/patients/[id]/decision">) {
   if (!sameOrigin(req)) return NextResponse.json({ error: "cross-origin" }, { status: 403 });
   const e = enrollmentOr404((await ctx.params).id);
@@ -32,16 +35,17 @@ export async function POST(req: Request, ctx: RouteContext<"/api/patients/[id]/d
   });
   audit({ actor: g.value.actor, action: "decision.recorded", enrollmentId: e.value.id, demoAt: at, detail: { route, followedSuggestion: suggested === route, score: a?.suitability.score ?? null } });
 
-  const en = DICTS.en;
-  const text = [
-    "ACTU pre-visit screening — APN decision (DEMO, synthetic data)",
-    `Decision: ${en[`route.${route}`] ?? route}`,
-    a ? `Virtual-care Suitability Index (illustrative, not validated): ${a.suitability.score}/100` : "Suitability Index: not run",
-    a ? `Assistant suggestion: ${en[`route.${suggested}`] ?? suggested}` : "",
-    a?.suitability.flags.length ? `Flags: ${a.suitability.flags.map((f) => f.kind).join(", ")}` : "Flags: none",
-    note ? `APN note: ${note}` : "",
-    "AI recommends; the APN decides.",
-  ].filter(Boolean).join("\n");
-  const rec = await writeToEpic(g.value.fhir, e.value.id, g.value.actor, clinicalNote(e.value.fhirPatientId, "ACTU pre-visit screening decision", text, at));
+  const text = decisionNoteText({
+    route,
+    apnNote: note,
+    decidedAt: at,
+    answers: st.answers,
+    answersSource: st.answersSource ?? null,
+    photoSource: st.photo?.source ?? null,
+    assistant: a,
+    labels: DICTS.en,
+  });
+  const encounterId = await latestEncounterId(g.value.fhir, e.value.fhirPatientId);
+  const rec = await writeToEpic(g.value.fhir, e.value.id, g.value.actor, clinicalNote(e.value.fhirPatientId, "ACTU pre-visit screening and APN decision", text, at, encounterId));
   return NextResponse.json({ ok: true, write: rec });
 }

@@ -26,10 +26,10 @@ export function CheckinForm({ enrollmentId, photos, suggested }: { enrollmentId:
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ answers, syntheticPhoto: photo }),
     });
-    const j = (await res.json()) as { error?: string; write?: { status: string; note?: string } };
+    const j = (await res.json()) as { error?: string };
     setBusy(false);
     if (!res.ok) return setMsg({ tone: "danger", text: j.error ?? `HTTP ${res.status}` });
-    setMsg({ tone: "ok", text: j.write?.status === "created" ? t("ci.sentEpic") : t("ci.sentLocal", { note: j.write?.note ?? "" }) });
+    setMsg({ tone: "ok", text: t("ci.sent") });
     router.refresh();
   }
 

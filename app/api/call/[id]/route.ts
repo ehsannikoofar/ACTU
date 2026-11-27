@@ -89,7 +89,7 @@ export async function POST(req: Request, ctx: RouteContext<"/api/call/[id]">) {
       update(() => {
         call.ended = true;
       });
-      await recordScreening({ enrollmentId: enr.id, answers: { ...call.draft }, source: "call", fhir: g.value.fhir, actor: agent });
+      await recordScreening({ enrollmentId: enr.id, answers: { ...call.draft }, source: "call", actor: agent });
       audit({ actor: agent, action: "call.completed", enrollmentId: enr.id, detail: { video: call.video === true, photo: call.photoCaptured } });
       finished = "completed";
     }

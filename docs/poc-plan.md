@@ -46,7 +46,7 @@ Quoted from the docs:
 |---|---|---|
 | Patient, Condition, Procedure, AllergyIntolerance, MedicationRequest, Encounter, Practitioner | read / search (+ create on some) | Chart review (Agent 2) |
 | **DocumentReference** | **create**, read, search, **update** | Read the OR note; **file the screening summary and APN decision note**; seed a synthetic OR note for the demo patient |
-| **QuestionnaireResponse** | **create**, read, search | File the completed pre-visit questionnaire |
+| **QuestionnaireResponse** | **create**, read, search | ✗ *Not usable for our questionnaire* — see the 2026-11-27 update below |
 | **Communication** | **create**, read, search | Patient ↔ clinic message (MyChart-style) |
 | **Observation** | **create**, read, search, update | Optional: patient-reported items |
 | Task | read, search, **update** (no create) | — |
@@ -55,6 +55,12 @@ Quoted from the docs:
 | Binary | read / search only | ⚠ Same |
 
 ⚠ **Not yet verified:** a server-wide "create" in the CapabilityStatement doesn't guarantee that *our* client, in *its* context, can create. Epic's per-API spec pages (which carry the sandbox notes) are rendered by JavaScript and couldn't be fetched. If you can, please paste the spec text for **QuestionnaireResponse.Create, Communication.Create and DocumentReference.Create (Clinical Notes)**. Otherwise I'll test each one on the first run with your client ID and **report any failure to you** rather than quietly work around it.
+
+### 2.3b Update 2026-11-27 — verified live, Option A chosen
+- Epic's API catalog (fhir.epic.com/Specifications data, API id 10023): `QuestionnaireResponse.Create (Patient-Entered Questionnaires) (R4)` — usage scopes *"Backend Systems… Clinicians or Administrative Users"* (no Patients); *"only supports answering patient-entered questionnaires assigned to an appointment or a questionnaire series"*. Our custom ACTU questionnaire therefore cannot be filed this way, by either app.
+- Live test: MyChart sign-in (`fhircamila`) worked end to end; Epic granted only `patient/Patient.read`; the QuestionnaireResponse attempt returned HTTP 403.
+- `DocumentReference.Create (Clinical Notes) (R4)` (API id 1046) — usage scopes include Clinicians; files a plain-text note to an encounter.
+- **Decision (owner): Option A** — the answers stay in the app until the APN decides; the clinician app then files ONE clinical note with the 10 answers, the assistant findings, the index and the decision (`lib/epic/decision-note.ts`). The patient app needs only Patient.Read.
 
 ### 2.4 Epic surfaces that don't exist for third-party apps (no workaround in Epic)
 - **Sending a MyChart push notification or message *to* a patient** from an external app: I found no documented API.
@@ -228,7 +234,7 @@ The index is **deterministic and transparent.** The AI only *extracts findings*,
 | OR note | DocumentReference.search + Binary.read | `user/DocumentReference.rs`, `user/Binary.r` | ✅ read | Local synthetic note |
 | Seed synthetic OR note | DocumentReference.create | `user/DocumentReference.c` | ⚠ to verify | Local store |
 | Follow-up visit V | Appointment.search | `user/Appointment.rs` | ✅ read (likely no matching visit for test patients) | Local "planned follow-up" record |
-| Questionnaire filed | QuestionnaireResponse.create | `patient/QuestionnaireResponse.c` | ⚠ to verify | Local + deferred write |
+| Questionnaire filed | Inside the APN decision note (DocumentReference.create) | `user/DocumentReference.c` | ✅ allowed for clinicians | QuestionnaireResponse.create ✗ (Epic-built questionnaires only; not for patient apps) |
 | MyChart-style message | Communication.create | `patient/Communication.c` | ⚠ to verify | Local |
 | Wound photo | Media.create | — | ❌ read-only | Local (encrypted at rest), referenced in the note |
 | Screening summary + APN decision | DocumentReference.create | `user/DocumentReference.c` | ⚠ to verify | Local + deferred write |
@@ -241,7 +247,7 @@ The index is **deterministic and transparent.** The AI only *extracts findings*,
 On fhir.epic.com → *Build Apps* → *Create*, make **two** apps:
 
 1. **"ACTU Follow-Up (Clinician)":** consumer type *Clinicians or Administrative Users*; redirect `http://localhost:3000/api/auth/callback/clinician`; the read APIs in §9 plus DocumentReference.Create.
-2. **"ACTU Follow-Up (Patient)":** consumer type *Patients*; redirect `http://localhost:3000/api/auth/callback/patient`; Patient.Read, QuestionnaireResponse.Create, Communication.Create.
+2. **"ACTU Follow-Up (Patient)":** consumer type *Patients*; redirect `http://localhost:3000/api/auth/callback/patient`; Patient.Read only (updated 2026-11-27, Option A).
 
 Then:
 - Mark each app *Ready for Sandbox* and wait up to 1 h.
@@ -257,7 +263,7 @@ You'll also need a **Claude API key** for the agents. When we start, I'll reques
 1. **Skeleton:** Next.js, UOHI-style shell, EN/FR, a11y basics, `.env.example`, SQLite, audit log, demo clock. Fixture mode first, so everything runs without keys.
 2. **Epic connection:** SMART clinician login → worklist from sandbox patients → patient chart panel. Verify the writes in §2.3 and report results.
 3. **MCP bridge + Agent 2:** tools, vision analysis, index (unit-tested), APN decision → DocumentReference.
-4. **Agent 1, async:** V−72 / V−48 timeline, patient phone view, MyChart login, questionnaire + photo → QuestionnaireResponse.
+4. **Agent 1, async:** V−72 / V−48 timeline, patient phone view, MyChart login, questionnaire + photo (kept in the app; filed in the decision note).
 5. **Agent 1, call:** in-browser voice/video conversation → structured answers.
 6. **Polish for stage:** demo script mode, recorded fixtures, README, a short traceability table.
 

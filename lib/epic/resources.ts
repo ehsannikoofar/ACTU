@@ -1,23 +1,5 @@
-// FHIR R4 resource builders for the writes the PoC attempts against the Epic sandbox.
+// FHIR R4 resource builders for the writes the PoC makes to the Epic sandbox (clinical notes only).
 import "server-only";
-import { ITEMS, type Answers } from "@/lib/pathway/questionnaire";
-
-export const QUESTIONNAIRE_CANONICAL = "urn:actu-poc:questionnaire:pre-visit-screening:v1";
-
-export function questionnaireResponse(patientId: string, answers: Answers, authored: string, labels: Record<string, string>) {
-  return {
-    resourceType: "QuestionnaireResponse",
-    status: "completed",
-    questionnaire: QUESTIONNAIRE_CANONICAL,
-    subject: { reference: `Patient/${patientId}` },
-    authored,
-    item: ITEMS.filter((i) => answers[i.id]).map((i) => ({
-      linkId: i.id,
-      text: labels[i.id] ?? i.id,
-      answer: [{ valueBoolean: answers[i.id] === "yes" }],
-    })),
-  };
-}
 
 export function clinicalNote(patientId: string, title: string, text: string, date: string, encounterId?: string) {
   return {

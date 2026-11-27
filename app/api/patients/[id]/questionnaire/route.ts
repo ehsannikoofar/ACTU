@@ -25,7 +25,6 @@ export async function POST(req: Request, ctx: RouteContext<"/api/patients/[id]/q
       enrollmentState(e.value.id).photo = { file, source: "mychart", at: now().toISOString() };
     });
   }
-  await recordScreening({ enrollmentId: e.value.id, answers, source: "mychart", fhir: g.value.fhir, actor: { kind: "patient", enrollmentId: e.value.id } });
-  const st = enrollmentState(e.value.id);
-  return NextResponse.json({ ok: true, write: st.writes.at(-1) ?? null });
+  await recordScreening({ enrollmentId: e.value.id, answers, source: "mychart", actor: { kind: "patient", enrollmentId: e.value.id } });
+  return NextResponse.json({ ok: true });
 }
