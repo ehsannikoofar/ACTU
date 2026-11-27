@@ -65,7 +65,7 @@ Copy each app's **Non-Production Client ID** into `.env`. Then check that the sa
 npm run check:epic
 ```
 
-✓ means Epic shows its login page; ✗ means Epic shows "Something went wrong trying to authorize the client" (client ID not synced yet, not the Non-Production ID, or redirect URI not registered exactly). (API names on the Epic site may be worded
+✓ means the sandbox recognises the client ID; ✗ means it does not (not synced yet, or not the Non-Production ID). Epic checks the **redirect URI only after sign-in**, so ✓ does not prove the redirect URI matches — it must be registered exactly as printed.
 slightly differently; pick the R4 versions closest to the list above.)
 
 If you later host the app (e.g. a web address for the committee), add that address's

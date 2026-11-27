@@ -1,7 +1,9 @@
 // Checks whether the Epic sandbox accepts this app's sign-in request for each client ID in .env.
 // Usage:  npm run check:epic
 // Read-only: sends the same GET /authorize request the app sends and reports whether Epic shows its
-// login page (accepted) or the generic "Something went wrong trying to authorize the client" page.
+// login page or the generic "Something went wrong trying to authorize the client" page.
+// NOTE: Epic only validates the redirect URI AFTER sign-in, so ✓ proves the client ID is known to the
+// sandbox, not that the redirect URI is registered exactly (verified 2026-11-27 with a deliberately wrong URI).
 const base = (process.env.EPIC_FHIR_BASE_URL || "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R4").replace(/\/$/, "");
 const app = (process.env.APP_BASE_URL || "http://localhost:3000").replace(/\/$/, "");
 
@@ -32,7 +34,7 @@ for (const a of apps) {
   }).toString();
   const html = await (await fetch(u)).text();
   const rejected = html.includes("Something went wrong trying to authorize the client");
-  console.log(`${rejected ? "✗" : "✓"} ${a.role}: client ${a.id.trim()}\n    redirect ${redirect}\n    ${rejected ? "Epic REJECTED the request (client ID not synced to the sandbox yet, not the Non-Production ID, or redirect URI not registered exactly)" : "Epic accepted the request (login page shown)"}`);
+  console.log(`${rejected ? "✗" : "✓"} ${a.role}: client ${a.id.trim()}\n    redirect ${redirect}\n    ${rejected ? "Epic does NOT recognise this client ID (not synced to the sandbox yet, or not the Non-Production ID)" : "Epic recognises this client ID. The redirect URI is only checked after sign-in; it must be registered exactly as shown above."}`);
   if (rejected) ok = false;
 }
 process.exit(ok ? 0 : 1);
