@@ -51,7 +51,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <div className="header-tools">
               {clinician ? (
                 <form action="/api/auth/logout" method="post" className="row">
-                  <span className="who">{t("auth.signedInAs", { user: clinician.fhirUser ?? "Epic user" })}</span>
+                  <span className="who">{t("auth.signedInAs", { user: shortUser(clinician.fhirUser) })}</span>
                   <button className="btn ghost small" type="submit">{t("auth.signOut")}</button>
                 </form>
               ) : config.dataSource === "epic" ? (
@@ -78,4 +78,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </body>
     </html>
   );
+}
+
+/** "https://…/FHIR/R4/Practitioner/evNp-KhYw…" → "Practitioner evNp-K…" (keeps the header compact). */
+function shortUser(fhirUser?: string): string {
+  if (!fhirUser) return "Epic user";
+  const [type, id] = fhirUser.split("/").slice(-2);
+  return id ? `${type} ${id.slice(0, 6)}…` : fhirUser;
 }
